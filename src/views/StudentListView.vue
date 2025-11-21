@@ -42,9 +42,10 @@
     </div>
   </div>
 
-  <AddStudentForm
-    v-model="addDialogVisible"
-    @submit="createStudent"
+  <StudentFormDialog
+    v-model="studentFormDialogVisible"
+    :student="selectedStudent"
+    @submit="handleSubmit"
   />
 </template>
 
@@ -54,75 +55,109 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { studentApi } from '@/api/studentApi'
 import StudentTable from '@/components/StudentTable.vue'
 import StudentSearch from '@/components/StudentSearch.vue'
-import AddStudentForm from '@/components/AddStudentForm.vue'
+import StudentFormDialog from '@/components/StudentFormDialog.vue'
+import cloneDeep from 'lodash-es/cloneDeep'
 
-// Khai báo biến
 const students = ref([])
 const pagination = ref(null)
 const gotoPage = ref('')
-const dialogVisibleTask = ref(false)
 const selectedStudent = ref(null)
 
-// Lưu search param hiện tại
 const currentSearch = ref({ query: '', field: 'name' })
-const addDialogVisible = ref(false) // Cần khai báo
-const newStudent = ref(null) // Cần khai báo
+const studentFormDialogVisible = ref(false)
 
+
+/* ============================
+      OPEN DIALOG
+=============================== */
 function openAddDialog() {
-  newStudent.value = { name: '', email: '', images: [] }
-  addDialogVisible.value = true
+  selectedStudent.value = null
+  studentFormDialogVisible.value = true
 }
 
-// ==== FETCH STUDENTS ====
+function openStudentDialog(student) {
+  selectedStudent.value = cloneDeep(student)
+  studentFormDialogVisible.value = true
+}
+
+
+/* ============================
+      FETCH STUDENTS
+=============================== */
 async function fetchStudents(page = 0, size = 10) {
   try {
     const params = { page, size }
-    // Thêm search param đúng field
+
     if (currentSearch.value.query) {
       params[currentSearch.value.field] = currentSearch.value.query
     }
 
-    const res = await studentApi.getStudents(params)
+    const res = await studentApi.search(params)
     students.value = res.data.data
     pagination.value = res.data.pagination
   } catch {
-    ElMessage.error('Không thể tải dữ liệu. Vui lòng thử lại sau.')
+    ElMessage.error('Không thể tải dữ liệu.')
     students.value = []
     pagination.value = null
   }
 }
-// ==== Create STUDENTS ====
-async function createStudent(formData) {
+
+
+/* ============================
+     CREATE / UPDATE STUDENT
+=============================== */
+async function handleSubmit(formData) {
   try {
     const fd = new FormData()
     fd.append('name', formData.name)
     fd.append('email', formData.email)
 
+    // Ảnh mới upload
     if (formData.images?.length) {
       formData.images.forEach(img => fd.append('images', img))
     }
 
-    await studentApi.createStudent(fd)
+    if (formData.id) {
+      // UPDATE
+      fd.append('studentId', formData.id)
 
-    ElMessage.success("Student created!")
+      // Ảnh bị xóa
+      if (formData.deleteImageIds?.length) {
+        formData.deleteImageIds.forEach(id => fd.append('deleteImageIds', id))
+      }
 
-    addDialogVisible.value = false
+      await studentApi.updateStudent(fd)
+      ElMessage.success('Student updated!')
+
+    } else {
+      // CREATE
+      await studentApi.create(fd, true)
+      ElMessage.success('Student created!')
+    }
+
+    // đóng dialog & refresh
+    studentFormDialogVisible.value = false
     fetchStudents(0, pagination.value?.pageSize || 10)
 
-  } catch {
-    ElMessage.error("Cannot create student.")
+  } catch (err) {
+    console.error(err)
+    ElMessage.error('Cannot submit student.')
   }
 }
 
 
-// ==== SEARCH HANDLER ====
+/* ============================
+        SEARCH
+=============================== */
 function handleSearch({ query, field }) {
   currentSearch.value = { query, field }
-  // Bắt đầu từ trang 0 (trang đầu tiên) sau khi tìm kiếm
   fetchStudents(0, pagination.value?.pageSize || 10)
 }
 
-// ==== PAGINATION ====
+
+/* ============================
+       PAGINATION
+=============================== */
 function handlePageChange(page) {
   fetchStudents(page - 1, pagination.value.pageSize)
 }
@@ -133,20 +168,19 @@ function handleSizeChange(size) {
 
 function jumpToPage() {
   if (!gotoPage.value) return
+
   let page = parseInt(gotoPage.value)
-  // Logic kiểm tra trang hợp lệ
   if (page < 1) page = 1
   if (page > pagination.value.totalPages) page = pagination.value.totalPages
+
   gotoPage.value = page
   fetchStudents(page - 1, pagination.value.pageSize)
 }
 
-// ==== EDIT & DELETE ====
-function openStudentDialog(student) {
-  selectedStudent.value = student
-  dialogVisibleTask.value = true
-}
 
+/* ============================
+        DELETE STUDENT
+=============================== */
 async function deleteStudent(id) {
   try {
     await ElMessageBox.confirm(
@@ -154,28 +188,25 @@ async function deleteStudent(id) {
       'Xác nhận xóa',
       { confirmButtonText: 'Đồng ý', cancelButtonText: 'Hủy', type: 'warning' }
     )
-    await studentApi.deleteStudent(id)
+
+    await studentApi.delete(id)
     ElMessage.success('Xóa sinh viên thành công!')
-    // Tải lại trang hiện tại (hoặc trang trước đó nếu trang hiện tại hết phần tử)
+
     fetchStudents(pagination.value.currentPage, pagination.value.pageSize)
+
   } catch (error) {
     if (error === 'cancel') return
-
-    // Log toàn bộ error ra console
     console.error('Delete student error:', error)
-
-    // Thêm sau này có thể dùng error.response?.data?.message
-    ElMessage.error('Có lỗi xảy ra, xem console để biết chi tiết')
+    ElMessage.error('Đã xảy ra lỗi khi xóa')
   }
 }
 
-// ==== ON MOUNT ====
+
 onMounted(() => {
   fetchStudents()
 })
-
-// Dấu đóng script setup không cần ở đây
 </script>
+
 
 <style scoped>
 .pagination-wrapper {

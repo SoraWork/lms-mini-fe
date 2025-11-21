@@ -1,19 +1,23 @@
 <template>
   <div class="search-bar">
-    <el-select v-model="field" placeholder="Tìm theo" size="small" style="width: 120px">
-      <el-option label="Tên" value="name" />
-      <el-option label="Email" value="email" />
+    <el-select
+      v-model="field"
+      placeholder="Tìm theo"
+      size="small"
+      style="width: 160px"
+    >
+    <el-option label="Tên" value="name" />
+    <el-option label="Email" value="email" />
     </el-select>
 
     <el-input
       v-model="query"
       placeholder="Nhập từ khóa..."
       size="small"
-      style="width: 200px"
-      @input="onInputChange"
-      @keyup.enter="onSearch"
+      style="width: 300px"
+    @input="onInputChange"
+    @keyup.enter="onSearch"
     />
-
   </div>
 </template>
 
@@ -44,7 +48,7 @@ function onSearch() {
 .search-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   margin-bottom: 16px;
 }
 </style>
