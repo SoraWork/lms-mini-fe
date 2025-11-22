@@ -24,10 +24,31 @@
         { prop: 'totalLessons', label: t('course.totalLessons') },
       ]"
       :actions="[
-        { label: t('course.view'), type: 'primary', handler: openViewDialog, icon: View },
-        { label: t('course.edit'), type: 'primary', handler: row => openCourseDialog(row), icon: Edit },
-        { label: t('course.delete'), type: 'danger', handler: row => deleteCourse(row.id), icon: Delete }
-      ]"
+      {
+        label: t('course.viewStudents'),
+        type: 'primary',
+        handler: row => router.push({ name: 'course-view-student', params: { id: row.id } }),
+        icon: View
+      },
+      {
+        label: t('course.viewLessons'),
+        type: 'primary',
+        handler: row => router.push({ name: 'course-view-lesson', params: { id: row.id } }),
+        icon: View
+      },
+      {
+        label: t('course.edit'),
+        type: 'warning',
+        handler: row => openCourseDialog(row),
+        icon: Edit
+      },
+      {
+        label: t('course.delete'),
+        type: 'danger',
+        handler: row => deleteCourse(row.id),
+        icon: Delete
+      }
+    ]"
       :show-index="true"
       :empty-text="t('course.noData')"
     />
@@ -60,6 +81,7 @@ import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import cloneDeep from 'lodash-es/cloneDeep'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 import { courseApi } from '@/api/courseApi'
 import EntityFormDialog from '@/components/EntityFormDialog.vue'
@@ -74,6 +96,8 @@ const selectedCourse = ref(null)
 const showCourseForm = ref(false)
 const currentSearch = ref({ query: '', field: 'name' })
 const { t } = useI18n()
+//router
+const router = useRouter()
 
 /* =========================
       OPEN DIALOG
@@ -112,9 +136,6 @@ function openCourseDialog(course) {
   showCourseForm.value = true
 }
 
-function openViewDialog(course) {
-  console.log('View course', course)
-}
 
 /* =========================
       FETCH COURSES
@@ -230,4 +251,5 @@ onMounted(() => fetchCourses())
   align-items: center;
   gap: 4px;
 }
+
 </style>

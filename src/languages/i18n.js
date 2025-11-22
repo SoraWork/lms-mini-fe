@@ -24,6 +24,14 @@ const messages = {
       deleteError: 'An error occurred while deleting the course',
       submitError: 'Cannot submit course.',
       fetchError: 'Cannot fetch courses.',
+      studentList: "Student List",
+      viewDetail: "Course Detail",
+      active: "Active",
+      inactive: "Inactive",
+      fetchDetailError: "Cannot fetch course detail.",
+      viewStudents:"View student",
+      viewLessons:"View lesson",
+      title:"Course List",
       validate: {
         nameRequired: "Course name is required",
         nameLength: "Course name is between 3 and 100 characters",
@@ -109,6 +117,16 @@ const messages = {
       admin: "Admin",
       developing: "This feature is under development!"
     },
+    lesson: {
+      list: "Lesson List",
+      title: "Title",
+      image: "Image",
+      video: "Video",
+      status: "Status",
+      noImage: "No Image",
+      noVideo: "No Video",
+      breadcrumbs: "Lessons"
+    },
     page404: {
       title: "404 - Page Not Found",
       message: "The page you requested could not be found."
@@ -140,6 +158,14 @@ const messages = {
       deleteError: 'Đã xảy ra lỗi khi xóa khóa học',
       submitError: 'Không thể gửi thông tin khóa học.',
       fetchError: 'Không thể tải dữ liệu khóa học.',
+      studentList: "Danh sách sinh viên",
+      viewDetail: "Chi tiết khóa học",
+      active: "Đang hoạt động",
+      inactive: "Ngừng hoạt động",
+      fetchDetailError: "Không thể tải dữ liệu khóa học.",
+      viewStudents:"Xem học sinh",
+      viewLessons:"Xem bài học",
+      title:"Danh sách khóa học",
       validate: {
         nameRequired: "Tên khóa học không được để trống",
         nameLength: "Tên khóa học từ 3 đến 100 ký tự",
@@ -223,6 +249,16 @@ const messages = {
       logout: "Đăng xuất",
       admin: "Quản trị",
       developing: "Chức năng đang được phát triển!"
+    },
+    lesson: {
+      list: "Danh sách bài học",
+      title: "Tiêu đề",
+      image: "Hình ảnh",
+      video: "Video",
+      status: "Trạng thái",
+      noImage: "Không có ảnh",
+      noVideo: "Không có video",
+      breadcrumbs: "Bài học"
     },
     page404: {
       title: "404 - Không tìm thấy trang",

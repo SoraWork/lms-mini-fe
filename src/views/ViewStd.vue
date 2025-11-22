@@ -24,7 +24,7 @@
       ]"
       :actions="[
         { label: t('student.view'), type: 'primary', handler: openViewDialog, icon: View },
-        { label: t('student.edit'), type: 'primary', handler: row => openStudentDialog(row), icon: Edit },
+        { label: t('student.edit'), type: 'warning', handler: row => openStudentDialog(row), icon: Edit },
         { label: t('student.delete'), type: 'danger', handler: row => deleteStudent(row.id), icon: Delete }
       ]"
       :show-index="true"
