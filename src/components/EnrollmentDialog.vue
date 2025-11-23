@@ -34,7 +34,7 @@
         </el-select>
       </el-form-item>
 
-      <!-- Hidden input lưu course bị xóa -->
+      <!-- Hidden input lưu khóa học bị xóa -->
       <input type="text" :value="deletedCourseIds" />
     </el-form>
 
@@ -78,6 +78,7 @@ watch(() => props.visible, (val) => {
   visibleInternal.value = val
   if (val && props.student) {
     form.value.studentId = props.student.id
+    // Khóa học đã đăng ký lúc mở dialog
     form.value.courseIds = props.student.courses?.map(c => c.id) || []
     oldRegisteredCourseIds.value = [...form.value.courseIds]
     deletedCourseIds.value = []
@@ -86,11 +87,18 @@ watch(() => props.visible, (val) => {
 
 // Watch form.courseIds để track deletedCourseIds
 watch(() => form.value.courseIds, (newVal, oldVal) => {
+  // Khóa bị bỏ ra -> thêm vào deletedCourseIds nếu trước đó đã đăng ký
   const removed = oldVal.filter(
     id => !newVal.includes(id) && oldRegisteredCourseIds.value.includes(id)
   )
   removed.forEach(id => {
     if (!deletedCourseIds.value.includes(id)) deletedCourseIds.value.push(id)
+  })
+
+  // Khóa được thêm lại -> remove khỏi deletedCourseIds
+  newVal.forEach(id => {
+    const index = deletedCourseIds.value.indexOf(id)
+    if (index > -1) deletedCourseIds.value.splice(index, 1)
   })
 })
 
@@ -102,6 +110,7 @@ const submitForm = () => {
   formRef.value.validate((valid) => {
     if (!valid) return
 
+    // Khóa học mới thêm (create)
     const courseIdsCreate = form.value.courseIds.filter(
       id => !oldRegisteredCourseIds.value.includes(id)
     )

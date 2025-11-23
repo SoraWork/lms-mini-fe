@@ -181,18 +181,27 @@ function handleSizeChange(size) {
 /* ========================= DELETE STUDENT ========================= */
 async function deleteStudent(id) {
   try {
-    await ElMessageBox.confirm(t('student.confirmDelete'), t('student.deleteTitle'), {
-      confirmButtonText: t('student.confirm'),
-      cancelButtonText: t('student.cancel'),
-      type: 'warning'
-    })
-    await studentApi.delete(id)
-    ElMessage.success(t('student.deleteSuccess'))
+    await ElMessageBox.confirm(
+      t('student.confirmDeleteCourses'),
+      t('student.deleteTitle'),
+      {
+        confirmButtonText: t('student.confirm'),
+        cancelButtonText: t('student.cancel'),
+        type: 'warning'
+      }
+    )
+
+    // Gọi API xóa tất cả enrollment
+    await enrollmentApi.deleteEnrollment({ studentId: id })
+
+    ElMessage.success(t('student.deleteAllCoursesSuccess'))
+
+    // Load lại danh sách students hoặc enrollment nếu cần
     fetchStudents(pagination.value.currentPage, pagination.value.pageSize)
   } catch (err) {
     if (err === 'cancel') return
-    console.error(err)
-    ElMessage.error(t('student.deleteError'))
+    console.error('Delete enrollments error:', err)
+    ElMessage.error(t('student.deleteAllCoursesError'))
   }
 }
 
