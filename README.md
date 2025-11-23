@@ -48,3 +48,11 @@ npm run test:unit
 ```sh
 npm run lint
 ```
+
+Giao diện chình
+<img width="1918" height="922" alt="image" src="https://github.com/user-attachments/assets/32ae24b8-7753-4d89-b91d-63a9b57640bd" />
+<img width="1918" height="928" alt="image" src="https://github.com/user-attachments/assets/d5d544d1-c444-407f-a581-678a012fd851" />
+<img width="1920" height="922" alt="image" src="https://github.com/user-attachments/assets/077d9232-0b49-432e-9071-ee30bb0bb37d" />
+
+
+
