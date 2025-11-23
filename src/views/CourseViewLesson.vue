@@ -57,7 +57,7 @@
         <template #image="{ row }">
           <el-carousel
             v-if="row.images?.length"
-            height="80px"
+            height="200px"
             indicator-position="none"
             arrow="always"
           >
@@ -88,7 +88,7 @@
     </el-card>
 
     <!-- Reusable Dialog cho Course -->
-    <EntityFormDialog
+    <AddLessonDialog
       v-model="isAddLessonDialogVisible"
       :entityData="newLesson"
       :fields="lessonFields"
@@ -96,9 +96,9 @@
       :hasUpload="true"
       :hasUploadVideo="true"
       :title="t('lesson.addNew')"
-      @submit="handleSubmitLesson"
+      @submit="handleCreateLesson"
     />
-    <EntityFormDialog
+    <AddLessonDialog
       v-model="isEditLessonDialogVisible"
       :entityData="editingLesson"
       :fields="lessonFields"
@@ -117,10 +117,10 @@ import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import EntityTableAdvanced from '@/components/EntityTableAdvanced.vue'
 import { courseApi } from '@/api/courseApi'
-import EntityFormDialog from '@/components/EntityFormDialog.vue'
 import { lessonApi } from '@/api/lessonApi'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Edit, Delete } from '@element-plus/icons-vue'
+import AddLessonDialog from '@/components/AddLessonDialog.vue'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -134,6 +134,9 @@ const editingLesson = ref(null)
 
 // Add New Lesson Form
 const isAddLessonDialogVisible = ref(false)
+
+const fileList = ref([]);
+const videoList = ref([]);
 
 // Form model cho Add Lesson
 const newLesson = ref({
@@ -167,7 +170,7 @@ const lessonActions = [
   },
 ]
 // Submit handler
-async function handleSubmitLesson(formData) {
+async function handleCreateLesson(formData) {
   try {
     const payload = {
       courseId: Number(route.params.id),
@@ -196,22 +199,67 @@ const openAddLessonDialog = () => {
   isAddLessonDialogVisible.value = true
 }
 const openEditLessonDialog = (lesson) => {
-  editingLesson.value = {
-    id: lesson.id,
-    title: lesson.title,
-    images: lesson.images?.map((img) => img.url),
-    videos: lesson.videos?.map((v) => v.url),
+  console.log("Opening edit dialog for lesson:", lesson);
+
+  if (lesson && lesson.id) {
+    // Kiểm tra dữ liệu thực sự trong lesson.images và lesson.videos
+    console.log("Lesson Images (before map):", lesson.images);
+    console.log("Lesson Videos (before map):", lesson.videos);
+
+    // Gán dữ liệu vào editingLesson
+    editingLesson.value = {
+      id: lesson.id,
+      title: lesson.title,
+      images: Array.isArray(lesson.images) ? lesson.images.map((img) => ({
+        id: img.id,          // ID ảnh
+        url: img.url,        // URL ảnh
+        name: `Image ${img.id}`,  // Tên ảnh
+        uid: `existing-${img.id}`  // UID ảnh
+      })) : [],
+
+      videos: Array.isArray(lesson.videos) ? lesson.videos.map((v) => ({
+        id: v.id,            // ID video
+        url: v.url,          // URL video
+        name: `Video ${v.id}`,  // Tên video
+        uid: `existing-video-${v.id}`  // UID video
+      })) : [],
+    };
+
+    console.log("Editing Lesson Data (after map):", editingLesson.value);
+
+    // Cập nhật fileList và videoList
+    fileList.value = editingLesson.value.images.map((img) => ({
+      name: img.name,
+      url: img.url,
+      uid: img.uid,
+      id: img.id,
+    }));
+
+    videoList.value = editingLesson.value.videos.map((v) => ({
+      name: v.name,
+      url: v.url,
+      uid: v.uid,
+      id: v.id,
+    }));
+
+    console.log("fileList:", fileList.value); // Log mảng fileList
+    console.log("videoList:", videoList.value); // Log mảng videoList
+
+    isEditLessonDialogVisible.value = true;
+  } else {
+    console.error("Không có dữ liệu bài học để sửa:", lesson);
   }
-  isEditLessonDialogVisible.value = true
-}
+};
 async function handleUpdateLesson(formData) {
   try {
     const payload = {
       title: formData.title,
-      images: formData.images.map((i) => (typeof i === 'string' ? i : i.url)),
-      videos: formData.videos.map((v) => (typeof v === 'string' ? v : v.url)),
+      imageIds: fileList.value.map(f => f.id).filter(Boolean),
+      videoIds: videoList.value.map(v => v.id).filter(Boolean),
+      images: formData.images || [],
+      videos: formData.videos || [],
     }
-
+    console.log("Payload gửi lên BE:", payload);
     await lessonApi.update(editingLesson.value.id, payload)
     ElMessage.success(t('lesson.updateSuccess'))
     isEditLessonDialogVisible.value = false

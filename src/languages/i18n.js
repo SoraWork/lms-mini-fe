@@ -89,6 +89,7 @@ const messages = {
       uploadSuccess: 'Upload images successfully!',
       uploadFailed: 'Failed to upload images.',
       cloudinaryError: 'Cloudinary upload failed',
+      videos:"Videos"
     },
     pagination: {
       total: 'Total: {n} elements',
@@ -131,6 +132,7 @@ const messages = {
       breadcrumbs: "Lessons",
       addNew:"Add New Lesson",
       deleteConfirm: "Are You Sure?",
+      edit: "Edit Lesson",
     },
     page404: {
       title: "404 - Page Not Found",
@@ -228,6 +230,7 @@ const messages = {
       uploadSuccess: 'Tải ảnh thành công!',
       uploadFailed: 'Tải ảnh thất bại.',
       cloudinaryError: 'Lỗi tải lên Cloudinary',
+      videos:"Videos"
     },
     pagination: {
       total: 'Tổng: {n} mục',
@@ -269,6 +272,7 @@ const messages = {
       breadcrumbs: "Bài học",
       addNew:"Thêm bài học",
       deleteConfirm: "Bạn chắc chứ",
+      edit: "Sửa bài học",
     },
     page404: {
       title: "404 - Không tìm thấy trang",

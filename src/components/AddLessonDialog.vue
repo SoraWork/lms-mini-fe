@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="visibleInternal"
-    :title="title || $t('lesson.addNew')"
+    :title="title || $t('form.title')"
     width="500px"
     @close="handleClose"
   >
@@ -11,171 +11,305 @@
       :rules="rules"
       ref="formRef"
     >
-      <!-- Title Field -->
-      <el-form-item label="{{ t('lesson.title') }}" :prop="title">
-        <el-input v-model="form.title" />
-      </el-form-item>
+      <!-- Dynamic fields -->
+      <template v-for="field in fields" :key="field.key">
+        <el-form-item :label="field.label" :prop="field.key">
+          <component
+            :is="field.type || 'el-input'"
+            v-model="form[field.key]"
+            v-bind="field.props"
+          />
+        </el-form-item>
+      </template>
 
-      <!-- Description Field -->
-      <el-form-item label="{{ t('lesson.description') }}" :prop="description">
-        <el-input type="textarea" v-model="form.description" />
-      </el-form-item>
-
-      <!-- Image Upload -->
-      <el-form-item v-if="hasUploadImage" :label="t('lesson.image')">
+      <!-- Upload images -->
+      <el-form-item v-if="hasUpload" :label="$t('form.images')">
         <el-upload
           action=""
           :auto-upload="false"
           multiple
           list-type="picture"
-          :on-change="handleImageFileChanges"
-          :on-remove="handleImageRemove"
-          :file-list="imageFileList"
+          :on-change="handleFileChanges"
+          :on-remove="handleFileRemove"
+          :file-list="fileList"
           :disabled="uploading"
         >
           <el-button type="primary" :loading="uploading">
-            {{ uploading ? t('form.uploading') : t('form.uploadImages') }}
+            {{ uploading ? $t('form.uploading') : $t('form.uploadImages') }}
           </el-button>
         </el-upload>
       </el-form-item>
 
-      <!-- Video Upload -->
-      <el-form-item v-if="hasUploadVideo" :label="t('lesson.video')">
+      <!-- Upload Videos -->
+      <el-form-item v-if="hasUploadVideo" :label="$t('form.videos')">
         <el-upload
           action=""
           :auto-upload="false"
-          :on-change="handleVideoFileChanges"
-          :file-list="videoFileList"
+          list-type="text"
+          accept="video/*"
+          :on-change="handleVideoChange"
+          :on-remove="handleVideoRemove"
+          :file-list="videoList"
           :disabled="uploading"
-          :before-remove="handleBeforeRemoveVideo"
         >
           <el-button type="primary" :loading="uploading">
-            {{ uploading ? t('form.uploading') : t('form.uploadVideo') }}
+            {{ uploading ? $t('form.uploading') : 'Upload Videos' }}
           </el-button>
         </el-upload>
       </el-form-item>
 
+      <!-- Hidden input lưu danh sách id ảnh bị xóa -->
+      <input type="text" :value="deleteImageIdsString" name="deleteImageIds" />
+      <input type="text" :value="deletedVideoIdsString" name="deleteVideoIds" />
     </el-form>
 
     <template #footer>
-      <el-button @click="handleClose">{{ t('form.cancel') }}</el-button>
+      <el-button @click="handleClose">{{ $t('form.cancel') }}</el-button>
       <el-button type="primary" @click="submitForm">
-        {{ entityData ? t('form.update') : t('form.create') }}
+        {{ entityData ? $t('form.update') : $t('form.create') }}
       </el-button>
     </template>
   </el-dialog>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 
+// i18n
 const { t } = useI18n()
+//err
+const formRef = ref(null)
+// Cloudinary Config
+const CLOUD_NAME = 'ddmbxigen'
+const UPLOAD_PRESET = 'uploadimage'
+const UPLOAD_PRESET_VID = 'uploadvid'
 
-// Props
 const props = defineProps({
   modelValue: Boolean,
   entityData: { type: Object, default: null },
   title: { type: String, default: '' },
-  hasUploadImage: { type: Boolean, default: true },
-  hasUploadVideo: { type: Boolean, default: true },
-  rules: { type: Object, default: () => ({}) },
+  fields: { type: Array, default: () => [] }, // [{key, label, type, props}]
+  hasUpload: { type: Boolean, default: false },
+  hasUploadVideo: { type: Boolean, default: false },
+  rules: { type: Object, default: () => ({}) }
 })
 
 const emit = defineEmits(['update:modelValue', 'submit'])
 
-// Internal state
 const visibleInternal = ref(false)
 const uploading = ref(false)
-const imageFileList = ref([]) // Image file list
-const videoFileList = ref([]) // Video file list
-const formRef = ref(null)
+const fileList = ref([]) // file list hiển thị
+const uploadedUrlsMap = ref(new Map()) // map uid -> url
+const deletedImageIds = ref([])
 
-const form = ref({
-  title: '',
-  description: '',
-  image: '',
-  video: ''
-})
+const videoList = ref([])
+const uploadedVideoMap = ref(new Map())
+const deletedVideoIds = ref([])
 
-// Watch to control visibility of dialog
-watch(() => props.modelValue, (val) => (visibleInternal.value = val))
+const deleteImageIdsString = computed(() => deletedImageIds.value.join(','))
+const deletedVideoIdsString = computed(() => deletedVideoIds.value.join(','))
 
-// Watch entityData to populate form for editing
+const form = ref({})
+
+// Watch modelValue để show/hide dialog
+watch(() => props.modelValue, val => (visibleInternal.value = val))
+
+// Watch entityData để load dữ liệu khi edit
+// Watch entityData để load dữ liệu khi edit
 watch(
   () => props.entityData,
   (val) => {
-    form.value = val ? { ...val } : {}
-    imageFileList.value = val?.image ? [{ name: val.image, url: val.image }] : []
-    videoFileList.value = val?.video ? [{ name: val.video, url: val.video }] : []
-  },
-  { immediate: true }
-)
+    if (val) {
+      // Reset form với dữ liệu mới
+      form.value = { ...val }
 
-// Close dialog and reset form
+      // Nếu có images và videos, cập nhật lại fileList và videoList
+      if (val.images) {
+        fileList.value = val.images.map((img, idx) => ({
+          name: `Image ${idx + 1}`,
+          url: img.url,
+          uid: `existing-${idx}`,
+          id: img.id,
+        }))
+      }
+
+      if (val.videos) {
+        videoList.value = val.videos.map((v, idx) => ({
+          name: `Video ${idx + 1}`,
+          url: v.url,
+          uid: `existing-video-${idx}`,
+          id: v.id,
+        }))
+      }
+    }
+  },
+  { immediate: true } // Thực thi ngay khi component mount
+);
+
+
+
+// Reset form khi đóng
 function handleClose() {
   emit('update:modelValue', false)
-  form.value = { title: '', description: '', image: '', video: '' }
-  imageFileList.value = []
-  videoFileList.value = []
+  form.value = {}
+  fileList.value = []
+  uploadedUrlsMap.value.clear()
+  deletedImageIds.value = []
+  deletedVideoIds.value = []
 }
 
-// Handle image file changes
-async function handleImageFileChanges(file) {
-  if (!file.raw) return
+/* ==========================================
+   HANDLE FILE CHANGE / UPLOAD
+========================================== */
+async function handleFileChanges(file) {
+  const files = file.raw ? [file.raw] : []
+  if (!files.length) return
+
   uploading.value = true
   try {
-    // Simulate uploading image
-    form.value.image = URL.createObjectURL(file.raw) // Assuming the image is uploaded and we get a URL
-    imageFileList.value.push(file)
+    const uploadedUrls = await uploadFilesToCloudinary(files)
+
+    files.forEach((f, index) => {
+      fileList.value.push({
+        name: f.name,
+        uid: f.uid,
+        url: uploadedUrls[index],
+      })
+      uploadedUrlsMap.value.set(f.uid, uploadedUrls[index])
+    })
+
+    form.value.images = Array.from(uploadedUrlsMap.value.values())
+
     ElMessage.success(t('form.uploadSuccess'))
-  } catch {
-    ElMessage.error(t('form.uploadFailed'))
+  } catch (err) {
+    ElMessage.error(err.message || t('form.uploadFailed'))
   } finally {
     uploading.value = false
   }
 }
 
-// Handle image removal
-function handleImageRemove(file) {
-  form.value.image = ''
-  imageFileList.value = imageFileList.value.filter(f => f.uid !== file.uid)
+function handleFileRemove(file, fileListUpdated) {
+  if (file.id) deletedImageIds.value.push(file.id)
+  uploadedUrlsMap.value.delete(file.uid)
+  form.value.images = Array.from(uploadedUrlsMap.value.values())
+  fileList.value = fileListUpdated
 }
 
-// Handle video file changes
-async function handleVideoFileChanges(file) {
-  if (!file.raw) return
+
+/* ==========================================
+   HANDLE VID CHANGE / UPLOAD
+========================================== */
+async function handleVideoChange(file) {
+  const files = file.raw ? [file.raw] : []
+  if (!files.length) return
+
   uploading.value = true
   try {
-    // Simulate uploading video
-    form.value.video = URL.createObjectURL(file.raw) // Assuming the video is uploaded and we get a URL
-    videoFileList.value.push(file)
-    ElMessage.success(t('form.uploadSuccess'))
+    const urls = await uploadVideosToCloudinary(files)
+
+    files.forEach((f, index) => {
+      const uid = crypto.randomUUID()
+
+      videoList.value.push({
+        name: f.name,
+        uid,
+        url: urls[index],
+      })
+
+      uploadedVideoMap.value.set(uid, {
+        url: urls[index],
+      })
+    })
+
+    form.value.videos = Array.from(uploadedVideoMap.value.values())
+    ElMessage.success("Upload video thành công!")
   } catch  {
-    ElMessage.error(t('form.uploadFailed'))
+    ElMessage.error("Upload video thất bại!")
   } finally {
     uploading.value = false
   }
 }
-
-// Handle before removing video file
-function handleBeforeRemoveVideo(file) {
-  form.value.video = ''
-  videoFileList.value = videoFileList.value.filter(f => f.uid !== file.uid)
-  return true
+function handleVideoRemove(file, updatedList) {
+  if (file.id) {
+    deletedVideoIds.value.push(file.id)
+  }
+  uploadedVideoMap.value.delete(file.uid)
+  form.value.videos = Array.from(uploadedVideoMap.value.values())
+  videoList.value = updatedList
+}
+/* ==========================================
+   UPLOAD TO CLOUDINARY
+========================================== */
+async function uploadFilesToCloudinary(files) {
+  const uploaded = []
+  for (const file of files) {
+    const url = await uploadToCloudinary(file)
+    uploaded.push(url)
+  }
+  if (!uploaded.length) throw new Error(t('form.uploadFailed'))
+  return uploaded
 }
 
-// Submit the form
+async function uploadToCloudinary(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('upload_preset', UPLOAD_PRESET)
+
+  const endpoint = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`
+  const res = await fetch(endpoint, { method: 'POST', body: formData })
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err.error?.message || t('form.cloudinaryError'))
+  }
+
+  const data = await res.json()
+  return data.secure_url
+}
+
+/* ==========================================
+   UPLOAD TO CLOUDINARY
+========================================== */
+async function uploadVideosToCloudinary(files) {
+  const uploaded = []
+  for (const file of files) {
+    const url = await uploadVideoToCloudinary(file)
+    uploaded.push(url)
+  }
+  return uploaded
+}
+
+async function uploadVideoToCloudinary(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('upload_preset', UPLOAD_PRESET_VID)
+
+  const endpoint = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`
+  const res = await fetch(endpoint, { method: 'POST', body: formData })
+
+  if (!res.ok) {
+    throw new Error("Cloudinary Upload Video Error")
+  }
+
+  const data = await res.json()
+  return data.secure_url
+}
+
+/* ==========================================
+   SUBMIT FORM
+========================================== */
 function submitForm() {
   formRef.value.validate(valid => {
     if (!valid) return
+    console.log("FORM GỬI LÊN", JSON.stringify(form.value, null, 2))
+    form.value.deleteImageIds = deletedImageIds.value
+    form.value.deleteVideoIds = deletedVideoIds.value
+    form.value.videos = Array.from(uploadedVideoMap.value.values()).map(v => v.url)
+    form.value.images = Array.from(uploadedUrlsMap.value.values())
     emit('submit', form.value)
     handleClose()
   })
 }
 </script>
-
-<style scoped>
-/* Add your component-specific styles here */
-</style>
