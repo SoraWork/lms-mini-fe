@@ -40,6 +40,24 @@
         </el-upload>
       </el-form-item>
 
+      <!-- Upload Videos -->
+      <el-form-item v-if="hasUploadVideo" :label="$t('form.videos')">
+        <el-upload
+          action=""
+          :auto-upload="false"
+          list-type="text"
+          accept="video/*"
+          :on-change="handleVideoChange"
+          :on-remove="handleVideoRemove"
+          :file-list="videoList"
+          :disabled="uploading"
+        >
+          <el-button type="primary" :loading="uploading">
+            {{ uploading ? $t('form.uploading') : 'Upload Videos' }}
+          </el-button>
+        </el-upload>
+      </el-form-item>
+
       <!-- Hidden input lưu danh sách id ảnh bị xóa -->
       <input type="hidden" :value="deleteImageIdsString" name="deleteImageIds" />
     </el-form>
@@ -65,6 +83,7 @@ const formRef = ref(null)
 // Cloudinary Config
 const CLOUD_NAME = 'ddmbxigen'
 const UPLOAD_PRESET = 'uploadimage'
+const UPLOAD_PRESET_VID = 'uploadvid'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -72,6 +91,7 @@ const props = defineProps({
   title: { type: String, default: '' },
   fields: { type: Array, default: () => [] }, // [{key, label, type, props}]
   hasUpload: { type: Boolean, default: false },
+  hasUploadVideo: { type: Boolean, default: false },
   rules: { type: Object, default: () => ({}) }
 })
 
@@ -82,6 +102,10 @@ const uploading = ref(false)
 const fileList = ref([]) // file list hiển thị
 const uploadedUrlsMap = ref(new Map()) // map uid -> url
 const deletedImageIds = ref([])
+
+const videoList = ref([])
+const uploadedVideoMap = ref(new Map())
+const deletedVideoIds = ref([])
 
 const deleteImageIdsString = computed(() => deletedImageIds.value.join(','))
 
@@ -104,13 +128,22 @@ watch(
         uid: `existing-${idx}`,
         id: img.id,
       })) || []
+    // Load vid cũ (nếu có)
+    videoList.value = val?.videos?.map((v) => ({
+      name:  `Video ${v.id}`,
+      url: v.url,
+      uid: `existing-video-${v.id}`,
+      id: v.id,
+    })) || []
+
+    uploadedVideoMap.value.clear()
+    deletedVideoIds.value = []
 
     uploadedUrlsMap.value.clear()
     deletedImageIds.value = []
   },
   { immediate: true }
 )
-
 // Reset form khi đóng
 function handleClose() {
   emit('update:modelValue', false)
@@ -118,6 +151,7 @@ function handleClose() {
   fileList.value = []
   uploadedUrlsMap.value.clear()
   deletedImageIds.value = []
+  deletedVideoIds.value = []
 }
 
 /* ==========================================
@@ -157,6 +191,48 @@ function handleFileRemove(file, fileListUpdated) {
   fileList.value = fileListUpdated
 }
 
+
+/* ==========================================
+   HANDLE VID CHANGE / UPLOAD
+========================================== */
+async function handleVideoChange(file) {
+  const files = file.raw ? [file.raw] : []
+  if (!files.length) return
+
+  uploading.value = true
+  try {
+    const urls = await uploadVideosToCloudinary(files)
+
+    files.forEach((f, index) => {
+      const uid = crypto.randomUUID()
+
+      videoList.value.push({
+        name: f.name,
+        uid,
+        url: urls[index],
+      })
+
+      uploadedVideoMap.value.set(uid, {
+        url: urls[index],
+      })
+    })
+
+    form.value.videos = Array.from(uploadedVideoMap.value.values())
+    ElMessage.success("Upload video thành công!")
+  } catch  {
+    ElMessage.error("Upload video thất bại!")
+  } finally {
+    uploading.value = false
+  }
+}
+function handleVideoRemove(file, updatedList) {
+  if (file.id) {
+    deletedVideoIds.value.push(file.id)
+  }
+  uploadedVideoMap.value.delete(file.uid)
+  form.value.videos = Array.from(uploadedVideoMap.value.values())
+  videoList.value = updatedList
+}
 /* ==========================================
    UPLOAD TO CLOUDINARY
 ========================================== */
@@ -188,12 +264,42 @@ async function uploadToCloudinary(file) {
 }
 
 /* ==========================================
+   UPLOAD TO CLOUDINARY
+========================================== */
+async function uploadVideosToCloudinary(files) {
+  const uploaded = []
+  for (const file of files) {
+    const url = await uploadVideoToCloudinary(file)
+    uploaded.push(url)
+  }
+  return uploaded
+}
+
+async function uploadVideoToCloudinary(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('upload_preset', UPLOAD_PRESET_VID)
+
+  const endpoint = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`
+  const res = await fetch(endpoint, { method: 'POST', body: formData })
+
+  if (!res.ok) {
+    throw new Error("Cloudinary Upload Video Error")
+  }
+
+  const data = await res.json()
+  return data.secure_url
+}
+
+/* ==========================================
    SUBMIT FORM
 ========================================== */
 function submitForm() {
   formRef.value.validate(valid => {
     if (!valid) return
+    console.log("FORM GỬI LÊN", JSON.stringify(form.value, null, 2))
     form.value.deleteImageIds = deletedImageIds.value
+    form.value.deleteVideoIds = deletedVideoIds.value
     emit('submit', form.value)
     handleClose()
   })

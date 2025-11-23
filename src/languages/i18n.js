@@ -71,7 +71,10 @@ const messages = {
       pageNotFound: '404 - Page Not Found',
       notFoundMsg: 'The page you are looking for does not exist.',
       searchPlaceholder: 'Search...',
-      language: 'Language'
+      language: 'Language',
+      edit: "Edit",
+      delete:"Delete",
+      warning:"Warning"
     },
 
     /* ---------- FORM COMMON TEXT ---------- */
@@ -125,7 +128,9 @@ const messages = {
       status: "Status",
       noImage: "No Image",
       noVideo: "No Video",
-      breadcrumbs: "Lessons"
+      breadcrumbs: "Lessons",
+      addNew:"Add New Lesson",
+      deleteConfirm: "Are You Sure?",
     },
     page404: {
       title: "404 - Page Not Found",
@@ -205,7 +210,10 @@ const messages = {
       pageNotFound: '404 - Không tìm thấy trang',
       notFoundMsg: 'Không tìm thấy trang bạn yêu cầu.',
       searchPlaceholder: 'Tìm kiếm...',
-      language: 'Ngôn ngữ'
+      language: 'Ngôn ngữ',
+      edit: "Sửa",
+      delete:"Xóa",
+      warning:"Cảnh báo"
     },
 
     /* ---------- FORM COMMON TEXT ---------- */
@@ -258,7 +266,9 @@ const messages = {
       status: "Trạng thái",
       noImage: "Không có ảnh",
       noVideo: "Không có video",
-      breadcrumbs: "Bài học"
+      breadcrumbs: "Bài học",
+      addNew:"Thêm bài học",
+      deleteConfirm: "Bạn chắc chứ",
     },
     page404: {
       title: "404 - Không tìm thấy trang",
