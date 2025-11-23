@@ -84,48 +84,47 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-
 import { courseApi } from '@/api/courseApi'
 import EntityTableAdvanced from '@/components/EntityTableAdvanced.vue'
 import EntityPagination from '@/components/EntityPagination.vue'
 
 const route = useRoute()
+const router = useRouter() // <--- Dùng hook này
 const { t } = useI18n()
 
 const course = ref(null)
 const students = ref([])
-
 const studentPagination = ref({
   currentPage: 0,
   pageSize: 10
 })
 
-/* -----------------------------------
-  TABLE COLUMNS (DYNAMIC + I18N)
------------------------------------ */
 const tableColumns = [
   { prop: 'name', label: t('student.name') },
   { prop: 'email', label: t('student.email'), slot: 'email' }
 ]
 
-/* -----------------------------------
-      FETCH COURSE + STUDENTS
------------------------------------ */
 async function fetchCourseDetail(page = 0, size = 10) {
   try {
     const id = route.params.id
     const res = await courseApi.getStudentsOfCourse(id, { page, size })
 
     course.value = res.data
+
+    // Nếu khóa học đã bị xóa hoặc không tồn tại
+    if (!course.value || course.value.status === 0 || course.value.status === '0') {
+      router.replace({ name: 'notfound' }) // <--- Dùng router từ useRouter
+      return
+    }
+
     students.value = res.data.students.data
     studentPagination.value = res.data.students.pagination
-
   } catch (err) {
     console.error(err)
-    ElMessage.error(t('course.fetchDetailError'))
+    // Lỗi fetch cũng redirect sang notfound
+    router.replace({ name: 'notfound' })
   }
 }
 

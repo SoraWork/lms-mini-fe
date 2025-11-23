@@ -154,9 +154,7 @@ function handleClose() {
   deletedVideoIds.value = []
 }
 
-/* ==========================================
-   HANDLE FILE CHANGE / UPLOAD
-========================================== */
+   // HANDLE FILE CHANGE / UPLOAD
 async function handleFileChanges(file) {
   const files = file.raw ? [file.raw] : []
   if (!files.length) return
@@ -192,9 +190,7 @@ function handleFileRemove(file, fileListUpdated) {
 }
 
 
-/* ==========================================
-   HANDLE VID CHANGE / UPLOAD
-========================================== */
+ //  HANDLE VID CHANGE / UPLOAD
 async function handleVideoChange(file) {
   const files = file.raw ? [file.raw] : []
   if (!files.length) return
@@ -233,9 +229,7 @@ function handleVideoRemove(file, updatedList) {
   form.value.videos = Array.from(uploadedVideoMap.value.values())
   videoList.value = updatedList
 }
-/* ==========================================
-   UPLOAD TO CLOUDINARY
-========================================== */
+//   UPLOAD TO CLOUDINARY
 async function uploadFilesToCloudinary(files) {
   const uploaded = []
   for (const file of files) {

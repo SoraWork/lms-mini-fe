@@ -121,6 +121,7 @@ import { lessonApi } from '@/api/lessonApi'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import AddLessonDialog from '@/components/AddLessonDialog.vue'
+import router from '@/router/index.js'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -288,18 +289,29 @@ const tableColumns = [
 ]
 
 async function fetchCourseDetail() {
-  const id = route.params.id
-  const res = await courseApi.getCourseDetail(id)
+  try {
+    const id = route.params.id
+    const res = await courseApi.getCourseDetail(id)
 
-  course.value = res.data
-  lessons.value = res.data.lessons
+    course.value = res.data
 
-  tableRows.value = lessons.value.map((l) => ({
-    ...l,
-    imagePreview: l.images?.length ? l.images[0].url : null,
-    videoUrl: l.videos?.length ? l.videos[0].url : null,
-    statusText: l.status === '1' ? t('course.active') : t('course.inactive'),
-  }))
+    if (!course.value || course.value.status === 0 || course.value.status === '0') {
+      router.replace({ name: 'notfound' })
+      return
+    }
+
+    lessons.value = res.data.lessons
+    tableRows.value = lessons.value.map((l) => ({
+      ...l,
+      imagePreview: l.images?.length ? l.images[0].url : null,
+      videoUrl: l.videos?.length ? l.videos[0].url : null,
+      statusText: l.status === '1' ? t('course.active') : t('course.inactive'),
+    }))
+  } catch (err) {
+    console.error(err)
+    // Lỗi fetch cũng redirect sang notfound
+    router.replace({ name: 'notfound' })
+  }
 }
 
 onMounted(fetchCourseDetail)

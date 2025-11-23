@@ -52,7 +52,7 @@ import { defineProps } from 'vue'
 
 <style>
 .table-wrapper {
-  border: 1.5px solid #d1d1d1; /* viền ngoài đậm hơn */
+  border: 1.5px solid #d1d1d1;
   border-radius: 8px;
   padding: 8px;
   background-color: #fff;

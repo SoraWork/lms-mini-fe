@@ -13,7 +13,8 @@
     >
       <!-- Học viên -->
       <el-form-item :label="$t('enrollment.student')">
-        <el-input v-model="form.studentId" disabled />
+        <input type="hidden" v-model="form.studentId" />
+        <el-input :value="props.student.name" readonly />
       </el-form-item>
 
       <!-- Chọn khóa học -->
