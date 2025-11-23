@@ -8,14 +8,16 @@ import MainLayout from '@/layout/MainLayout.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
 import CourseViewStudent from '@/views/CourseViewStudent.vue'
 import CourseViewLesson from '@/views/CourseViewLesson.vue'
+import EnrollmentView from '@/views/EnrollmentView.vue'
 
 const routes = [
   {
     path: '/',
     component: MainLayout,
     children: [
-      { path: '', name: 'students', component: StudentListView },
+      { path: '', name: 'students', component: ViewStd },
       { path: 'course', name: 'courses', component: CourseListView },
+      { path: 'enrollment', name: 'enrollment', component: EnrollmentView },
       {
         path: 'course/:id/student',
         name: 'course-view-student',
@@ -26,7 +28,6 @@ const routes = [
         name: 'course-view-lesson',
         component: CourseViewLesson
       },
-      { path: 'std', name: 'views', component: ViewStd },
       { path: ':pathMatch(.*)*', name: 'notfound', component: NotFoundView },
     ],
   },

@@ -108,7 +108,7 @@ const activeRoute = computed(() => route.path);
 const menuItems = [
   { key: 'studentMgr', index: "/", label: "sidebar.studentManager", icon: User },
   { key: 'courses', index: "/course", label: "sidebar.courses", icon: Notebook },
-  { key: 'viewStd', index: "/std", label: "sidebar.viewStd", icon: Document },
+  { key: 'viewStd', index: "/enrollment", label: "sidebar.enrollment", icon: Document },
   {
     key: 'more',
     label: "sidebar.more",

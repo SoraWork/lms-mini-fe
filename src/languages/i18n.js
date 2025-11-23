@@ -59,6 +59,7 @@ const messages = {
       deleteError: 'An error occurred while deleting the student',
       submitError: 'Cannot submit student.',
       fetchError: 'Cannot fetch students.',
+      register:"Register Course",
       validate: {
         nameRequired: "Student name is required",
         nameLength: "Student name is between 3 and 100 characters",
@@ -105,7 +106,7 @@ const messages = {
     sidebar: {
       studentManager: 'Student Manager',
       courses: 'Courses',
-      viewStd: 'View STD',
+      enrollment: 'Enrollment',
       more: 'More Features',
       report: 'Report',
       analytics: 'Analytics',
@@ -200,6 +201,7 @@ const messages = {
       deleteError: 'Đã xảy ra lỗi khi xóa sinh viên',
       submitError: 'Không thể gửi thông tin sinh viên.',
       fetchError: 'Không thể tải dữ liệu sinh viên.',
+      register:"Đăng ký khóa học",
       validate: {
         nameRequired: "Tên k dđc để trống",
         nameLength: "Tên phải từ 3 đến 100 ký tự",
@@ -245,7 +247,7 @@ const messages = {
     sidebar: {
       studentManager: 'Quản lý sinh viên',
       courses: 'Khóa học',
-      viewStd: 'Xem STD',
+      enrollment: 'Đăng ký khóa học',
       more: 'Tính năng khác',
       report: 'Báo cáo',
       analytics: 'Phân tích',
