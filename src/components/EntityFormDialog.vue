@@ -53,7 +53,7 @@
           :disabled="uploading"
         >
           <el-button type="primary" :loading="uploading">
-            {{ uploading ? $t('form.uploading') : 'Upload Videos' }}
+            {{ uploading ? $t('form.uploading') : $t('form.uploadVideos') }}
           </el-button>
         </el-upload>
       </el-form-item>
@@ -218,9 +218,9 @@ async function handleVideoChange(file) {
     })
 
     form.value.videos = Array.from(uploadedVideoMap.value.values())
-    ElMessage.success("Upload video thành công!")
+    ElMessage.success(t('form.uploadVideoSuccess'))
   } catch  {
-    ElMessage.error("Upload video thất bại!")
+    ElMessage.error(t('form.uploadVideoFailed'))
   } finally {
     uploading.value = false
   }

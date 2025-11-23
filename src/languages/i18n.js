@@ -33,13 +33,13 @@ const messages = {
       viewLessons:"View lesson",
       title:"Course List",
       exportExcel: "Export courses to excell",
+      exportSuccess:"Export course to excel",
       validate: {
         nameRequired: "Course name is required",
         nameLength: "Course name is between 3 and 100 characters",
         codeRequired: "Course code is required",
       }
     },
-
     student: {
       add: 'Add Student',
       name: 'Student Name',
@@ -62,6 +62,20 @@ const messages = {
       fetchError: 'Cannot fetch students.',
       register:"Register Course",
       exportExcel: "Export students to excell",
+      detailTitle: 'Student Detail: {name}',
+      personalInfo: 'Personal Information',
+      id: 'ID',
+      status: 'Status',
+      active: 'Active',
+      inactive: 'Inactive',
+      createdAt: 'Created At',
+      updatedAt: 'Updated At',
+      images: 'Images',
+      noImages: 'No images',
+      courses: 'Registered Courses ({n})',
+      noCourses: 'No registered courses',
+      code: 'Code',
+      close: 'Close',
       validate: {
         nameRequired: "Student name is required",
         nameLength: "Student name is between 3 and 100 characters",
@@ -69,7 +83,6 @@ const messages = {
         emailPaten: "Email is not correct format",
       }
     },
-
     common: {
       pageNotFound: '404 - Page Not Found',
       notFoundMsg: 'The page you are looking for does not exist.',
@@ -79,8 +92,6 @@ const messages = {
       delete:"Delete",
       warning:"Warning"
     },
-
-    /* ---------- FORM COMMON TEXT ---------- */
     form: {
       title: 'Form',
       cancel: 'Cancel',
@@ -92,7 +103,10 @@ const messages = {
       uploadSuccess: 'Upload images successfully!',
       uploadFailed: 'Failed to upload images.',
       cloudinaryError: 'Cloudinary upload failed',
-      videos:"Videos"
+      videos: 'Videos',
+      uploadVideos: 'Upload Videos',
+      uploadVideoSuccess: 'Upload video successfully!',
+      uploadVideoFailed: 'Upload video failed!'
     },
     pagination: {
       total: 'Total: {n} elements',
@@ -137,6 +151,26 @@ const messages = {
       deleteConfirm: "Are You Sure?",
       edit: "Edit Lesson",
     },
+    enrollment: {
+      title: "Enroll Course",
+      student: "Student",
+      course: "Course",
+      selectCourse: "Select course(s)",
+      cancel: "Cancel",
+      save: "Save",
+      validate: {
+        courseRequired: "Please select at least 1 course"
+      }
+    },
+    error: {
+      unknown: "Something went wrong. Please try again!",
+      invalidData: "Invalid data",
+      unauthorized: "You are not logged in",
+      forbidden: "You don't have permission",
+      notFound: "Resource not found",
+      server: "Server error",
+      noConnection: "Cannot connect to server!"
+    },
     page404: {
       title: "404 - Page Not Found",
       message: "The page you requested could not be found."
@@ -177,13 +211,13 @@ const messages = {
       viewLessons:"Xem bài học",
       title:"Danh sách khóa học",
       exportExcel: "Xuất excell khóa học",
+      exportSuccess:"Xuất excell khóa học",
       validate: {
         nameRequired: "Tên khóa học không được để trống",
         nameLength: "Tên khóa học từ 3 đến 100 ký tự",
         codeRequired: "Mã khóa học không được để trống",
       }
     },
-
     student: {
       add: 'Thêm sinh viên',
       name: 'Tên sinh viên',
@@ -206,6 +240,20 @@ const messages = {
       fetchError: 'Không thể tải dữ liệu sinh viên.',
       register:"Đăng ký khóa học",
       exportExcel: "Xuất excell học sinh",
+      detailTitle: 'Chi tiết sinh viên: {name}',
+      personalInfo: 'Thông tin cá nhân',
+      id: 'ID',
+      status: 'Trạng thái',
+      active: 'Hoạt động',
+      inactive: 'Không hoạt động',
+      createdAt: 'Ngày tạo',
+      updatedAt: 'Ngày cập nhật',
+      images: 'Hình ảnh',
+      noImages: 'Không có hình ảnh',
+      courses: 'Khóa học đã đăng ký ({n})',
+      noCourses: 'Chưa đăng ký khóa học nào',
+      code: 'Mã',
+      close: 'Đóng',
       validate: {
         nameRequired: "Tên k dđc để trống",
         nameLength: "Tên phải từ 3 đến 100 ký tự",
@@ -213,7 +261,6 @@ const messages = {
         emailPaten: "Email không đúng định dạng",
       }
     },
-
     common: {
       pageNotFound: '404 - Không tìm thấy trang',
       notFoundMsg: 'Không tìm thấy trang bạn yêu cầu.',
@@ -223,10 +270,8 @@ const messages = {
       delete:"Xóa",
       warning:"Cảnh báo"
     },
-
-    /* ---------- FORM COMMON TEXT ---------- */
     form: {
-      title: 'Biểu mẫu',
+      title: 'Biểu mẫu', // đã có
       cancel: 'Hủy',
       create: 'Tạo mới',
       update: 'Cập nhật',
@@ -236,7 +281,10 @@ const messages = {
       uploadSuccess: 'Tải ảnh thành công!',
       uploadFailed: 'Tải ảnh thất bại.',
       cloudinaryError: 'Lỗi tải lên Cloudinary',
-      videos:"Videos"
+      videos: 'Video',
+      uploadVideos: 'Tải video lên',
+      uploadVideoSuccess: 'Tải video thành công!',
+      uploadVideoFailed: 'Tải video thất bại!'
     },
     pagination: {
       total: 'Tổng: {n} mục',
@@ -279,6 +327,26 @@ const messages = {
       addNew:"Thêm bài học",
       deleteConfirm: "Bạn chắc chứ",
       edit: "Sửa bài học",
+    },
+    enrollment: {
+      title: "Đăng ký khoá học",
+      student: "Học viên",
+      course: "Khóa học",
+      selectCourse: "Chọn khóa học",
+      cancel: "Huỷ",
+      save: "Lưu",
+      validate: {
+        courseRequired: "Vui lòng chọn ít nhất 1 khóa học"
+      }
+    },
+    error: {
+      unknown: "Có lỗi xảy ra. Vui lòng thử lại!",
+      invalidData: "Dữ liệu không hợp lệ",
+      unauthorized: "Bạn chưa đăng nhập",
+      forbidden: "Bạn không có quyền",
+      notFound: "Không tìm thấy tài nguyên",
+      server: "Lỗi server",
+      noConnection: "Không thể kết nối tới server!"
     },
     page404: {
       title: "404 - Không tìm thấy trang",

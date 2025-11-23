@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-
-import StudentListView from "@/views/StudentListView.vue";
 import CourseListView from "@/views/CourseListView.vue";
-import ViewStd from "@/views/ViewStd.vue";
+import ViewStudent from "@/views/ViewStudent.vue";
 import MainLayout from '@/layout/MainLayout.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
 import CourseViewStudent from '@/views/CourseViewStudent.vue'
@@ -15,7 +13,7 @@ const routes = [
     path: '/',
     component: MainLayout,
     children: [
-      { path: '', name: 'students', component: ViewStd },
+      { path: '', name: 'students', component: ViewStudent },
       { path: 'course', name: 'courses', component: CourseListView },
       { path: 'enrollment', name: 'enrollment', component: EnrollmentView },
       {

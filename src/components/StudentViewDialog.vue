@@ -1,35 +1,34 @@
 <template>
   <el-dialog
     v-model="visible"
-    :title="`Chi tiết sinh viên: ${student?.name || ''}`"
+    :title="t('student.detailTitle', { name: student?.name || '' })"
     width="800px"
     :before-close="handleClose"
   >
     <div v-if="student" class="student-detail">
-      <!-- Thông tin cơ bản -->
-      <el-descriptions title="Thông tin cá nhân" :column="2" border>
-        <el-descriptions-item label="ID">{{ student.id }}</el-descriptions-item>
-        <el-descriptions-item label="Tên">{{ student.name }}</el-descriptions-item>
-        <el-descriptions-item label="Email" :span="2">{{ student.email }}</el-descriptions-item>
-        <el-descriptions-item label="Trạng thái">
+      <el-descriptions :title="t('student.personalInfo')" :column="2" border>
+        <el-descriptions-item :label="t('student.id')">{{ student.id }}</el-descriptions-item>
+        <el-descriptions-item :label="t('student.name')">{{ student.name }}</el-descriptions-item>
+        <el-descriptions-item :label="t('student.email')" :span="2">{{ student.email }}</el-descriptions-item>
+        <el-descriptions-item :label="t('student.status')">
           <el-tag :type="student.status === '1' ? 'success' : 'danger'">
-            {{ student.status === '1' ? 'Hoạt động' : 'Không hoạt động' }}
+            {{ student.status === '1' ? t('student.active') : t('student.inactive') }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="Tổng môn đăng ký">
+        <el-descriptions-item :label="t('student.totalEnrollments')">
           {{ student.totalEnrollments }}
         </el-descriptions-item>
-        <el-descriptions-item label="Ngày tạo">
+        <el-descriptions-item :label="t('student.createdAt')">
           {{ formatDate(student.createdAt) }}
         </el-descriptions-item>
-        <el-descriptions-item label="Ngày cập nhật">
+        <el-descriptions-item :label="t('student.updatedAt')">
           {{ formatDate(student.updatedAt) }}
         </el-descriptions-item>
       </el-descriptions>
 
       <!-- Danh sách hình ảnh -->
       <div class="section">
-        <h3>Hình ảnh</h3>
+        <h3>{{ t('student.images') }}</h3>
         <div v-if="student.images && student.images.length > 0" class="image-grid">
           <div
             v-for="image in student.images"
@@ -54,12 +53,12 @@
             </div>
           </div>
         </div>
-        <el-empty v-else description="Không có hình ảnh" :image-size="80" />
+        <el-empty v-else :description="t('student.noImages')" :image-size="80" />
       </div>
 
       <!-- Danh sách khóa học -->
       <div class="section">
-        <h3>Khóa học đã đăng ký ({{ student.courses ? student.courses.length : 0 }})</h3>
+        <h3>{{ t('student.courses', { n: student.courses?.length || 0 }) }}</h3>
         <div v-if="student.courses && student.courses.length > 0" class="courses-list">
           <el-card
             v-for="course in student.courses"
@@ -70,19 +69,19 @@
             <div class="course-info">
               <div class="course-name">{{ course.name }}</div>
               <div class="course-code">
-                <el-tag type="info" size="small">Mã: {{ course.code }}</el-tag>
+                <el-tag type="info" size="small">{{ t('student.code') }}: {{ course.code }}</el-tag>
               </div>
             </div>
           </el-card>
         </div>
-        <el-empty v-else description="Chưa đăng ký khóa học nào" :image-size="80" />
+        <el-empty v-else :description="t('student.noCourses')" :image-size="80" />
       </div>
     </div>
 
     <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="handleClose">Đóng</el-button>
-      </span>
+    <span class="dialog-footer">
+      <el-button @click="handleClose">{{ t('student.close') }}</el-button>
+    </span>
     </template>
   </el-dialog>
 </template>
@@ -90,6 +89,9 @@
 <script setup>
 import { computed } from 'vue'
 import { Picture } from '@element-plus/icons-vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   visible: {

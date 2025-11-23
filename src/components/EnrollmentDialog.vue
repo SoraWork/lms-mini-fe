@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="visibleInternal"
-    title="Đăng ký khoá học"
+    :title="$t('enrollment.title')"
     width="600px"
     @close="handleClose"
   >
@@ -12,18 +12,18 @@
       ref="formRef"
     >
       <!-- Học viên -->
-      <el-form-item label="Student">
+      <el-form-item :label="$t('enrollment.student')">
         <el-input v-model="form.studentId" disabled />
       </el-form-item>
 
       <!-- Chọn khóa học -->
-      <el-form-item label="Khóa học" prop="courseIds">
+      <el-form-item :label="$t('enrollment.course')" prop="courseIds">
         <el-select
           v-model="form.courseIds"
           multiple
           filterable
           clearable
-          placeholder="Chọn khóa học"
+          :placeholder="$t('enrollment.selectCourse')"
         >
           <el-option
             v-for="course in courses"
@@ -35,19 +35,21 @@
       </el-form-item>
 
       <!-- Hidden input lưu khóa học bị xóa -->
-      <input type="text" :value="deletedCourseIds" />
+      <input type="hidden" :value="deletedCourseIds" />
     </el-form>
 
     <template #footer>
-      <el-button @click="handleClose">Huỷ</el-button>
-      <el-button type="primary" @click="submitForm">Lưu</el-button>
+      <el-button @click="handleClose">{{ $t('enrollment.cancel') }}</el-button>
+      <el-button type="primary" @click="submitForm">{{ $t('enrollment.save') }}</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
   visible: Boolean,
   student: Object,      // Học viên được chọn
@@ -70,7 +72,7 @@ const oldRegisteredCourseIds = ref([])
 const deletedCourseIds = ref([])
 
 const rules = {
-  courseIds: [{ required: true, message: 'Vui lòng chọn ít nhất 1 khóa học' }]
+  courseIds: [{ required: true, message: t('enrollment.validate.courseRequired') }]
 }
 
 // Watch prop visible để reset form

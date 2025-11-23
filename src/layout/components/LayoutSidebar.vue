@@ -109,15 +109,15 @@ const menuItems = [
   { key: 'studentMgr', index: "/", label: "sidebar.studentManager", icon: User },
   { key: 'courses', index: "/course", label: "sidebar.courses", icon: Notebook },
   { key: 'viewStd', index: "/enrollment", label: "sidebar.enrollment", icon: Document },
-  {
-    key: 'more',
-    label: "sidebar.more",
-    icon: Document,
-    children: [
-      { index: "/report", label: "sidebar.report" },
-      { index: "/analytics", label: "sidebar.analytics" },
-    ]
-  }
+  // {
+  //   key: 'more',
+  //   label: "sidebar.more",
+  //   icon: Document,
+  //   children: [
+  //     { index: "/report", label: "sidebar.report" },
+  //     { index: "/analytics", label: "sidebar.analytics" },
+  //   ]
+  // }
 ];
 
 function toggleSubmenu(key) {

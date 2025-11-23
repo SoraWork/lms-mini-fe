@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toast } from "vue3-toastify";
+import { t } from "@/utils/i18nHelper";
 
 const axiosClient = axios.create({
   baseURL: "http://localhost:8080/api",
@@ -9,24 +10,23 @@ const axiosClient = axios.create({
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    let message = "Có lỗi xảy ra. Vui lòng thử lại!";
+    let message = t("error.unknown");
 
     if (error.response) {
       const status = error.response.status;
       const data = error.response.data;
 
-      // server có trả message thì ưu tiên dùng
       if (data?.message) message = data.message;
 
       switch (status) {
-        case 400: message = message || "Dữ liệu không hợp lệ"; break;
-        case 401: message = "Bạn chưa đăng nhập"; break;
-        case 403: message = "Bạn không có quyền"; break;
-        case 404: message = "Không tìm thấy tài nguyên"; break;
-        case 500: message = "Lỗi server"; break;
+        case 400: message = message || t("error.invalidData"); break;
+        case 401: message = t("error.unauthorized"); break;
+        case 403: message = t("error.forbidden"); break;
+        case 404: message = t("error.notFound"); break;
+        case 500: message = t("error.server"); break;
       }
     } else {
-      message = "Không thể kết nối tới server!";
+      message = t("error.noConnection");
     }
 
     toast.error(message);
