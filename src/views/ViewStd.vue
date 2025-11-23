@@ -12,6 +12,7 @@
 
     <div class="mb-3 flex justify-end">
       <el-button type="primary" @click="openAddDialog">{{ t('student.add') }}</el-button>
+      <el-button type="success" @click="exportStudents">{{ t('student.exportExcel') }}</el-button>
     </div>
 
     <!-- Reusable Table -->
@@ -148,6 +149,25 @@ async function onStudentSubmit(formData) {
   } catch (err) {
     console.error(err)
     ElMessage.error(t('student.submitError'))
+  }
+}
+// EXPORT STUDENT
+async function exportStudents() {
+  try {
+    const res = await studentApi.exportExcel();
+    const blob = new Blob([res.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "students.xlsx";
+    a.click();
+    window.URL.revokeObjectURL(url);
+    ElMessage.success(t("student.exportSuccess"));
+  } catch (err) {
+    console.error(err);
+    ElMessage.error(t("student.exportError"));
   }
 }
 

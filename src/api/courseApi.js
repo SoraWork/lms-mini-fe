@@ -19,5 +19,10 @@ export const courseApi = {
     const id = formData.get("courseId");
     formData.delete("courseId");
     return createApi("courses").update(id, formData, true);
+  },
+  exportExcel() {
+    return axiosClient.get("/courses/export", {
+      responseType: "arraybuffer" // quan trọng
+    });
   }
 };

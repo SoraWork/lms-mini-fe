@@ -32,6 +32,7 @@ const messages = {
       viewStudents:"View student",
       viewLessons:"View lesson",
       title:"Course List",
+      exportExcel: "Export courses to excell",
       validate: {
         nameRequired: "Course name is required",
         nameLength: "Course name is between 3 and 100 characters",
@@ -60,6 +61,7 @@ const messages = {
       submitError: 'Cannot submit student.',
       fetchError: 'Cannot fetch students.',
       register:"Register Course",
+      exportExcel: "Export students to excell",
       validate: {
         nameRequired: "Student name is required",
         nameLength: "Student name is between 3 and 100 characters",
@@ -174,6 +176,7 @@ const messages = {
       viewStudents:"Xem học sinh",
       viewLessons:"Xem bài học",
       title:"Danh sách khóa học",
+      exportExcel: "Xuất excell khóa học",
       validate: {
         nameRequired: "Tên khóa học không được để trống",
         nameLength: "Tên khóa học từ 3 đến 100 ký tự",
@@ -202,6 +205,7 @@ const messages = {
       submitError: 'Không thể gửi thông tin sinh viên.',
       fetchError: 'Không thể tải dữ liệu sinh viên.',
       register:"Đăng ký khóa học",
+      exportExcel: "Xuất excell học sinh",
       validate: {
         nameRequired: "Tên k dđc để trống",
         nameLength: "Tên phải từ 3 đến 100 ký tự",

@@ -12,6 +12,7 @@
 
     <div class="mb-3 flex justify-end">
       <el-button type="primary" @click="openAddDialog">{{ t('course.add') }}</el-button>
+      <el-button type="success" @click="exportCourses">{{ t('course.exportExcel') }}</el-button>
     </div>
 
     <!-- Reusable Table cho Course -->
@@ -226,6 +227,25 @@ async function deleteCourse(id) {
     if (error === 'cancel') return
     console.error('Delete course error:', error)
     ElMessage.error(t('course.deleteError'))
+  }
+}
+// EXPORT COURSE
+async function exportCourses() {
+  try {
+    const res = await courseApi.exportExcel();
+    const blob = new Blob([res.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "courses.xlsx";
+    a.click();
+    window.URL.revokeObjectURL(url);
+    ElMessage.success(t("course.exportSuccess"));
+  } catch (err) {
+    console.error(err);
+    ElMessage.error(t("course.exportError"));
   }
 }
 
